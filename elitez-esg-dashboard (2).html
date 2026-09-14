@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Impact+</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-deep:#0F1E3C; --navy:#17284D; --navy-soft:#2A3E68;
+    --orange:#F0731E; --orange-deep:#D25E0F;
+    --teal:#0E6B63;
+    --paper:#F5F6F9; --card:#FFFFFF;
+    --line:#E4E7EE; --line-strong:#CBD1DE;
+    --ink:#182335; --ink-soft:#5A6478; --ink-faint:#8C93A4;
+    --complete:#1E8E5A; --complete-bg:#E3F5EB;
+    --amber:#C97A11; --amber-bg:#FBEEDA;
+    --missing:#C6432B; --missing-bg:#FBE6E1;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;-webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.brand,.nav-item,.card-title{font-family:'Poppins',sans-serif;}
+
+  .shell{display:grid;grid-template-columns:230px 1fr;min-height:100vh;}
+
+  /* Sidebar */
+  .sidebar{background:var(--navy-deep);color:#fff;padding:22px 16px;display:flex;flex-direction:column;}
+  .brand{display:flex;align-items:center;gap:8px;padding:4px 6px 22px;border-bottom:1px solid rgba(255,255,255,0.12);margin-bottom:14px;}
+  .brand-icon{width:36px;height:36px;border-radius:9px;background:linear-gradient(145deg,var(--orange),var(--orange-deep));display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Poppins';font-weight:700;font-size:19px;flex-shrink:0;box-shadow:0 3px 10px rgba(240,115,30,0.35);}
+  .brand-mark{font-weight:700;font-size:19px;color:#fff;letter-spacing:0.01em;}
+  .brand-mark span{color:var(--orange);}
+  .brand-sub{font-size:9.5px;color:rgba(255,255,255,0.5);margin-top:3px;letter-spacing:0.09em;}
+  .nav{display:flex;flex-direction:column;gap:2px;}
+  .nav-item{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:6px;font-size:13.5px;font-weight:500;color:rgba(255,255,255,0.72);cursor:pointer;border-left:3px solid transparent;}
+  .nav-item:hover{background:rgba(255,255,255,0.06);}
+  .nav-item.active{background:rgba(240,115,30,0.14);color:#fff;border-left:3px solid var(--orange);}
+  .nav-dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:0.6;}
+  .sidebar-foot{margin-top:auto;padding-top:16px;border-top:1px solid rgba(255,255,255,0.12);font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;}
+
+  /* Main */
+  .content{padding:26px 34px 50px;max-width:1280px;}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:22px;padding-bottom:16px;border-bottom:1px solid var(--line-strong);}
+  .topbar h1{font-size:21px;font-weight:600;color:var(--navy-deep);margin:0 0 4px;}
+  .topbar .meta{font-size:12.5px;color:var(--ink-soft);}
+  .period-pill{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--navy);background:#EDF0F7;border:1px solid var(--line-strong);padding:6px 12px;border-radius:20px;}
+
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* Grid + cards */
+  .grid{display:grid;gap:16px;margin-bottom:16px;}
+  .g3{grid-template-columns:repeat(3,1fr);}
+  .g2{grid-template-columns:1.3fr 1fr;}
+  .g2e{grid-template-columns:1fr 1fr;}
+  @media (max-width:1000px){ .g3,.g2,.g2e{grid-template-columns:1fr;} .shell{grid-template-columns:1fr;} .sidebar{flex-direction:row;overflow-x:auto;} .nav{flex-direction:row;} }
+
+  .card{background:var(--card);border:1px solid var(--line-strong);border-radius:8px;padding:18px 20px;}
+  .card-title{font-size:12.5px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.03em;margin:0 0 14px;}
+  .card-note{font-size:11.5px;color:var(--ink-faint);margin:-8px 0 12px;line-height:1.5;}
+
+  /* Big stat */
+  .stat-figure{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:36px;color:var(--navy-deep);line-height:1;}
+  .stat-figure span{font-size:16px;color:var(--ink-soft);font-weight:500;margin-left:5px;}
+  .stat-sub{font-size:12px;color:var(--ink-faint);margin-top:6px;}
+
+  /* Score breakdown rows */
+  .score-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line);font-size:13px;}
+  .score-row:last-child{border-bottom:none;}
+  .score-track{width:100px;height:5px;background:var(--line);border-radius:3px;overflow:hidden;}
+  .score-fill{height:100%;background:var(--orange);}
+
+  /* Cert badges grid */
+  .cert-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .cert-item{border:1px solid var(--line-strong);border-radius:6px;padding:10px 12px;font-size:12px;}
+  .cert-item .cn{font-weight:600;color:var(--navy);display:block;margin-bottom:2px;}
+  .cert-item .cd{color:var(--ink-faint);font-size:11px;}
+  .cert-item.done{border-color:var(--complete);background:var(--complete-bg);}
+  .cert-item.progress{border-color:var(--amber);background:var(--amber-bg);}
+  .pillar-tag{display:inline-block;font-size:9px;font-weight:700;width:15px;height:15px;line-height:15px;text-align:center;border-radius:50%;margin-left:3px;color:#fff;}
+  .pillar-tag.e{background:var(--teal);}
+  .pillar-tag.s{background:var(--orange);}
+  .pillar-tag.g{background:var(--navy);}
+
+  /* Impact medal */
+  .medal-wrap{display:flex;gap:26px;align-items:center;}
+  .medal-circle{width:118px;height:118px;border-radius:50%;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .medal-circle.silver{background:radial-gradient(circle at 35% 30%, #FFFFFF, #C7CDD9 55%, #9AA3B2 100%);border:4px solid #9AA3B2;box-shadow:0 4px 14px rgba(30,40,60,0.18);}
+  .medal-circle .mt{font-family:'Poppins';font-weight:700;font-size:11px;letter-spacing:0.06em;color:#3A4150;}
+  .medal-circle .ms{font-family:'IBM Plex Mono';font-weight:700;font-size:30px;color:#1F2430;line-height:1;margin-top:2px;}
+  .medal-circle .mo{font-size:9px;color:#5A6478;margin-top:2px;}
+
+  /* Target/action list */
+  .action-row{display:grid;grid-template-columns:20px 1fr;gap:8px;font-size:13px;padding:7px 0;border-bottom:1px dashed var(--line);}
+  .action-row:last-child{border-bottom:none;}
+  .action-num{font-family:'IBM Plex Mono',monospace;color:var(--orange-deep);font-weight:600;font-size:12px;}
+
+  /* Table */
+  table.data-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  table.data-table th{text-align:left;font-size:10.5px;color:var(--ink-faint);font-weight:600;text-transform:uppercase;letter-spacing:0.02em;padding:6px 8px;border-bottom:1px solid var(--line-strong);}
+  table.data-table td{padding:7px 8px;border-bottom:1px solid var(--line);}
+  table.data-table tr:last-child td{font-weight:600;border-top:2px solid var(--line-strong);border-bottom:none;background:#F7F8FB;}
+
+  /* Forms */
+  .form-field{margin-bottom:12px;}
+  .form-field label{display:block;font-size:11.5px;color:var(--ink-soft);margin-bottom:5px;}
+  .form-field select,.form-field input{width:100%;padding:9px 10px;border:1px solid var(--line-strong);border-radius:5px;background:#FBFBFD;font-family:'IBM Plex Sans';font-size:13px;color:var(--ink);}
+  .form-field input[readonly]{background:#EFF1F6;color:var(--ink-soft);}
+  .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+  .btn{padding:10px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid transparent;}
+  .btn-primary{background:var(--orange);color:#fff;}
+  .btn-primary:hover{background:var(--orange-deep);}
+  .btn-outline{background:#fff;border:1px solid var(--navy);color:var(--navy);}
+  .btn-outline:hover{background:#F0F2F8;}
+
+  .subtabs{display:flex;gap:6px;margin-bottom:12px;}
+  .subtab{padding:6px 12px;font-size:12px;font-weight:600;border:1px solid var(--line-strong);border-radius:20px;color:var(--ink-soft);cursor:pointer;}
+  .subtab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .subview{display:none;} .subview.active{display:block;}
+
+  .log-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:12.5px;align-items:center;}
+  .log-row small{display:block;color:var(--ink-faint);font-size:11px;}
+  .badge{font-size:10px;font-weight:600;padding:3px 7px;border-radius:12px;border:1px solid;white-space:nowrap;}
+  .badge.verified{color:var(--complete);border-color:var(--complete);background:var(--complete-bg);}
+  .badge.estimated{color:var(--amber);border-color:var(--amber);background:var(--amber-bg);}
+
+  .grade-card{border:1px solid var(--line-strong);border-radius:8px;margin-bottom:14px;}
+  .grade-head{display:flex;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line);}
+  .grade-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px;}
+  .grade-badge.a{background:var(--complete-bg);color:var(--complete);}
+  .grade-badge.b{background:var(--amber-bg);color:var(--amber);}
+  .grade-badge.c{background:var(--missing-bg);color:var(--missing);}
+  .grade-body{padding:12px 16px;font-size:12.5px;}
+  .grade-item{display:grid;grid-template-columns:16px 1fr;gap:8px;padding:3px 0;}
+  .grade-item.gap{color:var(--missing);}
+
+  .upload-zone{border:1.5px dashed var(--line-strong);border-radius:6px;padding:12px;text-align:center;font-size:12px;color:var(--ink-faint);cursor:pointer;margin-bottom:12px;}
+  .upload-zone.has-file{border-style:solid;border-color:var(--complete);color:var(--complete);background:var(--complete-bg);}
+
+  .milestone{display:flex;gap:9px;font-size:12.5px;padding:7px 0;border-bottom:1px dashed var(--line);}
+  .milestone:last-child{border-bottom:none;}
+  .m-dot{width:7px;height:7px;border-radius:50%;background:var(--orange);margin-top:5px;flex-shrink:0;}
+
+  .toast{position:fixed;right:28px;bottom:24px;background:var(--navy-deep);color:#fff;font-size:12.5px;padding:11px 18px;border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,0.25);opacity:0;transform:translateY(10px);transition:all .25s ease;pointer-events:none;}
+  .toast.show{opacity:1;transform:translateY(0);}
+
+  .people-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;font-size:12px;}
+  .person{border:1px solid var(--line);border-radius:6px;padding:10px;text-align:center;}
+  .person .pn{font-weight:600;color:var(--navy);}
+  .person .pr{color:var(--ink-faint);font-size:11px;margin-top:2px;}
+
+  .report-doc{background:#fff;border:1px solid var(--line-strong);border-radius:8px;padding:28px;max-width:720px;}
+  .report-doc h2{font-size:20px;color:var(--navy-deep);margin:0 0 2px;}
+  .report-doc .sub{font-size:12.5px;color:var(--ink-soft);border-bottom:1px solid var(--line-strong);padding-bottom:14px;margin-bottom:16px;}
+
+  /* GRI-style report document */
+  .rpt-cover{background:var(--navy-deep);color:#fff;border-radius:8px 8px 0 0;padding:46px 44px 40px;}
+  .rpt-cover .mark{font-family:'Poppins';font-weight:700;font-size:20px;}
+  .rpt-cover .mark span{color:var(--orange);}
+  .rpt-cover .tag{font-size:10.5px;color:rgba(255,255,255,0.5);letter-spacing:0.08em;margin:2px 0 34px;}
+  .rpt-cover h1{font-family:'Poppins';font-size:32px;font-weight:700;margin:0 0 8px;line-height:1.2;}
+  .rpt-cover .sub1{font-size:14px;color:rgba(255,255,255,0.85);margin:0 0 4px;}
+  .rpt-cover .sub2{font-size:12px;color:rgba(255,255,255,0.55);}
+  .rpt-part{display:flex;align-items:baseline;gap:12px;margin:36px 0 6px;padding-top:20px;border-top:2px solid var(--orange);}
+  .rpt-part .pn{font-family:'IBM Plex Mono';font-size:12px;color:var(--orange-deep);font-weight:700;}
+  .rpt-part h2{font-family:'Poppins';font-size:19px;font-weight:600;color:var(--navy-deep);margin:0;}
+  .rpt-body{font-size:12.5px;color:var(--ink-soft);line-height:1.7;margin:10px 0 16px;}
+  .rpt-sub{font-size:13px;font-weight:600;color:var(--navy);margin:16px 0 8px;}
+  .status-pill{display:inline-block;font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;margin-left:8px;vertical-align:middle;}
+  .status-pill.complete{background:var(--complete-bg);color:var(--complete);}
+  .status-pill.partial{background:var(--amber-bg);color:var(--amber);}
+
+  /* Richer report elements */
+  .rpt-toc{display:grid;grid-template-columns:1fr 1fr;gap:6px 28px;margin:18px 0 6px;padding:18px 20px;background:#F4F6FA;border-radius:6px;}
+  .rpt-toc a{font-size:12.5px;color:var(--navy);text-decoration:none;display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--line-strong);}
+  .rpt-toc a span{color:var(--ink-faint);font-family:'IBM Plex Mono';font-size:11px;}
+  .pull-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0 22px;}
+  .pull-stat{text-align:center;padding:14px 8px;border-top:3px solid var(--orange);}
+  .pull-stat .pv{font-family:'Poppins';font-weight:700;font-size:27px;color:var(--navy-deep);}
+  .pull-stat .pl{font-size:10.5px;color:var(--ink-soft);margin-top:4px;line-height:1.4;}
+  .quote-box{background:#F4F6FA;border-left:4px solid var(--orange);border-radius:0 6px 6px 0;padding:20px 24px;margin:20px 0;}
+  .quote-box p{font-size:14px;color:var(--navy-deep);font-style:italic;line-height:1.6;margin:0 0 8px;}
+  .quote-box .qa{font-size:11.5px;color:var(--ink-soft);font-style:normal;font-weight:600;}
+  .rpt-divider{text-align:center;margin:30px 0 16px;}
+  .rpt-divider .dn{font-family:'Poppins';font-weight:700;font-size:11px;color:var(--orange-deep);letter-spacing:0.12em;}
+  .rpt-divider h2{font-family:'Poppins';font-size:24px;font-weight:700;color:var(--navy-deep);margin:4px 0 0;}
+  .rpt-refs{font-size:11.5px;color:var(--ink-soft);line-height:2;}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="brand" style="display:flex;align-items:center;gap:11px;">
+      <div class="brand-icon">+</div>
+      <div>
+        <div class="brand-mark">IMPACT<span>+</span></div>
+        <div class="brand-sub">ESG &amp; CARBON PLATFORM</div>
+      </div>
+    </div>
+    <div class="nav">
+      <div class="nav-item active" data-tab="dashboard"><span class="nav-dot"></span>Dashboard</div>
+      <div class="nav-item" data-tab="profile"><span class="nav-dot"></span>Company Profile</div>
+      <div class="nav-item" data-tab="environmental"><span class="nav-dot"></span>Environmental</div>
+      <div class="nav-item" data-tab="social"><span class="nav-dot"></span>Social</div>
+      <div class="nav-item" data-tab="governance"><span class="nav-dot"></span>Governance</div>
+      <div class="nav-item" data-tab="credentials"><span class="nav-dot"></span>Credentials</div>
+      <div class="nav-item" data-tab="suppliers"><span class="nav-dot"></span>Suppliers</div>
+      <div class="nav-item" data-tab="report"><span class="nav-dot"></span>Report</div>
+      <div class="nav-item" data-tab="audit"><span class="nav-dot"></span>Audit trail</div>
+    </div>
+    <div class="sidebar-foot" id="sidebar-foot-text">Elitez Pte Ltd<br>AY25/26 reporting period (demo)</div>
+  </aside>
+
+  <main class="content">
+
+    <div class="topbar">
+      <div>
+        <h1>Impact+</h1>
+        <div class="meta" id="topbar-meta">Elitez Pte Ltd · HR &amp; workforce solutions · 150 employees · 7 offices</div>
+      </div>
+      <div class="period-pill">AY25/26 · 1 MAY 2025 – 30 APR 2026 (demo)</div>
+    </div>
+
+    <!-- ============ DASHBOARD ============ -->
+    <div class="view active" id="view-dashboard">
+      <div class="card" style="margin-bottom:16px;">
+        <div class="medal-wrap">
+          <div class="medal-circle silver">
+            <span class="mt">SILVER</span>
+            <span class="ms">72</span>
+            <span class="mo">/ 100</span>
+          </div>
+          <div style="flex:1;">
+            <p class="card-title">Overall Impact Score</p>
+            <p class="card-note" style="margin-bottom:10px;">Composite rating across Environmental, Social and Governance performance — the same tier logic behind ratings like EcoVadis, applied to everything tracked in this platform.</p>
+            <div class="score-row"><span>Environmental</span><div style="display:flex;align-items:center;gap:8px;"><div class="score-track"><div class="score-fill" style="width:78%;background:var(--teal);"></div></div><span style="font-family:'IBM Plex Mono';font-size:12px;">78</span></div></div>
+            <div class="score-row"><span>Social</span><div style="display:flex;align-items:center;gap:8px;"><div class="score-track"><div class="score-fill" style="width:62%;"></div></div><span style="font-family:'IBM Plex Mono';font-size:12px;">62</span></div></div>
+            <div class="score-row"><span>Governance</span><div style="display:flex;align-items:center;gap:8px;"><div class="score-track"><div class="score-fill" style="width:76%;background:var(--navy);"></div></div><span style="font-family:'IBM Plex Mono';font-size:12px;">76</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="grid g3">
+        <div class="card">
+          <p class="card-title">Total GHG emissions</p>
+          <p class="stat-figure">57,689.83<span>kg CO₂e</span></p>
+          <p class="stat-sub">57.69 tCO₂e · up from 53,089.00 kg in AY22/23 (+8.7%)</p>
+        </div>
+        <div class="card">
+          <p class="card-title">Carbon intensity</p>
+          <p class="stat-figure">1.2<span>kg CO₂e / SGD 1,000</span></p>
+          <p class="stat-sub">Revenue AY25/26: SGD 48,130,435 (demo label)</p>
+        </div>
+        <div class="card">
+          <p class="card-title">Emissions by scope</p>
+          <div class="score-row"><span>Scope 1 (not tracked)</span><span>0.00 kg</span></div>
+          <div class="score-row"><span>Scope 2 — electricity</span><span>41,971.24 kg</span></div>
+          <div class="score-row"><span>Scope 3 — water + air travel</span><span>15,709.59 kg</span></div>
+        </div>
+      </div>
+
+      <div class="grid g2">
+        <div class="card">
+          <p class="card-title">Certifications &amp; framework alignment</p>
+          <div class="cert-grid">
+            <div class="cert-item done"><span class="cn">ISO 14001:2015</span><span class="cd">Certified</span></div>
+            <div class="cert-item done"><span class="cn">ISO 9001:2015</span><span class="cd">Certified</span></div>
+            <div class="cert-item done"><span class="cn">BizSAFE Level 3</span><span class="cd">Awarded</span></div>
+            <div class="cert-item progress"><span class="cn">EcoVadis</span><span class="cd">Silver 2023</span></div>
+            <div class="cert-item done"><span class="cn">DPTM</span><span class="cd">Mar 2024</span></div>
+            <div class="cert-item done"><span class="cn">SG Cyber Essential Mark</span><span class="cd">Awarded</span></div>
+            <div class="cert-item done"><span class="cn">LowCarbonSG</span><span class="cd">Participant</span></div>
+            <div class="cert-item done"><span class="cn">CPLC Singapore</span><span class="cd">Member since Aug 2022</span></div>
+            <div class="cert-item done"><span class="cn">UN Global Compact</span><span class="cd">10 Principles signatory</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <p class="card-title">Net-zero targets</p>
+          <div class="score-row"><span>Carbon neutral</span><span style="font-family:'IBM Plex Mono'" id="tgt-neutral-year">2030</span></div>
+          <div class="score-row"><span>Net-zero emissions</span><span style="font-family:'IBM Plex Mono'" id="tgt-netzero-year">2050</span></div>
+          <div class="score-row"><span>Scope 2 reduction</span><span style="font-family:'IBM Plex Mono'" id="tgt-scope2">-50% by 2030</span></div>
+          <div class="score-row"><span>Scope 3 reduction</span><span style="font-family:'IBM Plex Mono'" id="tgt-scope3">-20% by 2030</span></div>
+          <div class="score-row"><span>Renewable electricity</span><span style="font-family:'IBM Plex Mono'" id="tgt-renewable">100% by Q4 2025</span></div>
+          <div class="score-row"><span>Paper waste</span><span style="font-family:'IBM Plex Mono'" id="tgt-paper">Zero by 2030</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <p class="card-title">Priority actions</p>
+        <div class="action-row"><span class="action-num">1</span><span>Track Scope 1 fuel/refrigerant use if the vehicle or fleet position changes</span></div>
+        <div class="action-row"><span class="action-num">2</span><span>Establish a gender-in-management baseline against the 3-year leadership diversity target</span></div>
+        <div class="action-row"><span class="action-num">3</span><span>Engage suppliers on the 30% Scope 3 emissions reduction collaboration target</span></div>
+        <div class="action-row"><span class="action-num">4</span><span>Move EcoVadis rating from Silver toward Gold ahead of next assessment cycle</span></div>
+      </div>
+    </div>
+
+    <!-- ============ COMPANY PROFILE ============ -->
+    <div class="view" id="view-profile">
+      <p class="card-note" style="margin:0 0 16px;">This is where the numbers on every other page actually come from. Change something here and hit save — nothing on the Dashboard, Environmental or Social tabs updates on its own until it's set here first.</p>
+
+      <div class="grid g2e">
+        <div class="card">
+          <p class="card-title">Company profile</p>
+          <div class="form-field"><label>Company name</label><input type="text" id="p-name" value="Elitez Pte Ltd"></div>
+          <div class="form-row-2">
+            <div class="form-field"><label>Industry</label>
+              <select id="p-industry">
+                <option>HR &amp; workforce solutions</option>
+                <option>Logistics &amp; transport</option>
+                <option>Manufacturing</option>
+                <option>F&amp;B</option>
+                <option>Retail</option>
+                <option>Construction</option>
+                <option>Financial services</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-field"><label>Company size</label>
+              <select id="p-size">
+                <option>Micro (&lt;10 employees)</option>
+                <option>Small (10–50 employees)</option>
+                <option selected>Medium (50–200 employees)</option>
+                <option>Large (200+ employees)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-field"><label>Total employees</label><input type="number" id="p-employees" value="150"></div>
+            <div class="form-field"><label>Number of offices</label><input type="number" id="p-offices" value="7"></div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-field"><label>Annual revenue (SGD)</label><input type="number" id="p-revenue" value="48130435"></div>
+            <div class="form-field"><label>HQ location</label><input type="text" id="p-hq" value="Singapore"></div>
+          </div>
+          <div class="form-field"><label>Reporting period label</label><input type="text" id="p-period" value="AY25/26"></div>
+          <button class="btn btn-primary" onclick="saveProfile()">Save profile</button>
+        </div>
+
+        <div class="card">
+          <p class="card-title">Environmental targets</p>
+          <div class="form-row-2">
+            <div class="form-field"><label>Carbon neutral by</label><input type="number" id="p-neutral-year" value="2030"></div>
+            <div class="form-field"><label>Net-zero emissions by</label><input type="number" id="p-netzero-year" value="2050"></div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-field"><label>Scope 2 reduction target (%)</label><input type="number" id="p-scope2-pct" value="50"></div>
+            <div class="form-field"><label>...by year</label><input type="number" id="p-scope2-year" value="2030"></div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-field"><label>Scope 3 reduction target (%)</label><input type="number" id="p-scope3-pct" value="20"></div>
+            <div class="form-field"><label>...by year</label><input type="number" id="p-scope3-year" value="2030"></div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-field"><label>Renewable electricity target (%)</label><input type="number" id="p-renew-pct" value="100"></div>
+            <div class="form-field"><label>...by</label><input type="text" id="p-renew-when" value="Q4 2025"></div>
+          </div>
+          <div class="form-field"><label>Paper waste target</label><input type="text" id="p-paper" value="Zero by 2030"></div>
+        </div>
+      </div>
+
+      <div class="grid g2e">
+        <div class="card">
+          <p class="card-title">Social targets</p>
+          <div class="form-row-2">
+            <div class="form-field"><label>Women in leadership +% target</label><input type="number" id="p-leadership-pct" value="15"></div>
+            <div class="form-field"><label>...within (years)</label><input type="number" id="p-leadership-years" value="3"></div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-field"><label>Workforce upskilling target (%)</label><input type="number" id="p-upskill-pct" value="50"></div>
+            <div class="form-field"><label>...within (years)</label><input type="number" id="p-upskill-years" value="5"></div>
+          </div>
+          <div class="form-field"><label>Underrepresented group representation +%</label><input type="number" id="p-underrep-pct" value="10"></div>
+          <div class="form-field"><label>Health-related absenteeism reduction (%)</label><input type="number" id="p-absentee-pct" value="20"></div>
+        </div>
+
+        <div class="card">
+          <p class="card-title">Why this matters</p>
+          <p class="rpt-body" style="margin-top:0;">Every target shown elsewhere in Impact+ — the net-zero year on the Dashboard, the Scope 2/3 reduction goals, the leadership diversity commitment on Social — is a value entered here, not something the platform infers or generates on its own. If a target changes, or a new tenant with completely different goals starts using this platform, this is the page that would need to be filled in first.</p>
+          <p class="rpt-body">In a real multi-tenant build, this page would run once during onboarding for each client company, and every dashboard, report and target list downstream would read from it rather than from hardcoded figures.</p>
+          <button class="btn btn-outline" onclick="showToast('Reset to Elitez\\'s real reported defaults.')">Reset to Elitez defaults</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ ENVIRONMENTAL ============ -->
+    <div class="view" id="view-environmental">
+      <div class="grid g2e">
+        <div class="card">
+          <p class="card-title">Scope 2 — electricity by office (AY25/26)</p>
+          <table class="data-table">
+            <tr><th>Office unit</th><th>kWh</th><th>kg CO₂e</th></tr>
+            <tr><td>Kallang Ave #03-01/02 CT Hub</td><td>8,001.44</td><td>3,264.59</td></tr>
+            <tr><td>Kallang Ave #03-05 CT Hub</td><td>20,341.06</td><td>8,299.15</td></tr>
+            <tr><td>Kallang Ave #03-06 CT Hub</td><td>15,840.41</td><td>6,462.89</td></tr>
+            <tr><td>Kallang Ave #03-07/08/09 CT Hub</td><td>17,769.22</td><td>7,249.84</td></tr>
+            <tr><td>Kallang Ave #06-26/28 CT Hub</td><td>27,153.55</td><td>11,078.65</td></tr>
+            <tr><td>Kallang Ave #06-29/30 CT Hub</td><td>13,765.00</td><td>5,616.12</td></tr>
+            <tr><td>Total</td><td>78,432.68</td><td>41,971.24</td></tr>
+          </table>
+          <p class="card-note" style="margin-top:10px;">Conversion factor: 0.4080 kg CO₂/kWh (Energy Market Authority)</p>
+        </div>
+        <div class="card">
+          <p class="card-title">Scope 3 — water consumption by office</p>
+          <table class="data-table">
+            <tr><th>Office unit</th><th>Cu M</th><th>kg CO₂e</th></tr>
+            <tr><td>Kallang Ave #03-01/02 CT Hub</td><td>25.90</td><td>33.67</td></tr>
+            <tr><td>Kallang Ave #03-05 CT Hub</td><td>60.30</td><td>78.39</td></tr>
+            <tr><td>Kallang Ave #03-07/08/09 CT Hub</td><td>436.10</td><td>566.93</td></tr>
+            <tr><td>Kallang Ave #06-26/28 CT Hub</td><td>95.00</td><td>123.50</td></tr>
+            <tr><td>Kallang Ave #06-29/30 CT Hub</td><td>190.80</td><td>248.40</td></tr>
+            <tr><td>Total</td><td>808.10</td><td>1,050.89</td></tr>
+          </table>
+          <p class="card-note" style="margin-top:10px;">Conversion factor: 1.30 kg CO₂/m³ (GCNSG tool). Air transport: 14,658.70 kg CO₂e via ICAO calculator — not tied to a single office.</p>
+        </div>
+      </div>
+
+      <div class="grid g2e">
+        <div class="card">
+          <p class="card-title">3-year emissions trend</p>
+          <div id="trend-chart-env" style="margin-bottom:10px;"></div>
+          <table class="data-table">
+            <tr><th>Year</th><th>Scope 2 (kg)</th><th>Scope 3 (kg)</th><th>Total (kg)</th></tr>
+            <tr><td>AY21/22 (baseline)</td><td>28,262.86</td><td>1,040.35</td><td>29,303.21</td></tr>
+            <tr><td>AY22/23</td><td>39,737.15</td><td>13,351.85</td><td>53,089.00</td></tr>
+            <tr><td>AY25/26</td><td>41,971.24</td><td>15,709.59</td><td>57,689.83</td></tr>
+          </table>
+          <p class="card-note" style="margin-top:10px;">Scope 3 jump AY21/22→AY22/23 driven by the return of business air travel post-COVID (+2,360%).</p>
+        </div>
+
+        <div class="card">
+          <p class="card-title">Log a new entry</p>
+          <div class="subtabs">
+            <div class="subtab active" data-sub="s2">Scope 2</div>
+            <div class="subtab" data-sub="s3">Scope 3</div>
+          </div>
+          <div class="subview active" id="sub-s2">
+            <div class="form-field"><label>Category</label><input value="Grid electricity" readonly></div>
+            <div class="form-row-2">
+              <div class="form-field"><label>Month</label><select><option>Jan</option><option>Feb</option><option>Mar</option><option>Apr</option><option>May</option><option>Jun</option><option>Jul</option><option>Aug</option><option>Sep</option><option>Oct</option><option>Nov</option><option>Dec</option></select></div>
+              <div class="form-field"><label>Office unit</label><select><option>#03-01/02</option><option>#03-05</option><option>#03-06</option><option>#03-07/08/09</option><option>#06-26/28</option><option>#06-29/30</option></select></div>
+            </div>
+            <div class="form-field"><label>kWh consumed</label><input type="number" id="s2-qty" placeholder="e.g. 8,001"></div>
+            <div class="upload-zone" id="s2-upload" onclick="pickFile('s2')">📎 Attach SP Group bill</div>
+            <button class="btn btn-primary" onclick="addEntry('s2', 0.4080)">Add entry</button>
+          </div>
+          <div class="subview" id="sub-s3">
+            <div class="form-field">
+              <label>Category</label>
+              <select id="s3-cat">
+                <option value="Water" data-factor="1.30" data-unit="m³">Water consumption (m³)</option>
+                <option value="Air travel" data-factor="0" data-unit="km">Business air travel (via ICAO calculator)</option>
+              </select>
+            </div>
+            <div class="form-field"><label>Month</label><select><option>Jan</option><option>Feb</option><option>Mar</option><option>Apr</option><option>May</option><option>Jun</option><option>Jul</option><option>Aug</option><option>Sep</option><option>Oct</option><option>Nov</option><option>Dec</option></select></div>
+            <div class="form-field"><label>Quantity</label><input type="number" id="s3-qty" placeholder="e.g. 26"></div>
+            <div class="upload-zone" id="s3-upload" onclick="pickFile('s3')">📎 Attach water bill / travel ticket</div>
+            <button class="btn btn-primary" onclick="addEntry('s3', null)">Add entry</button>
+          </div>
+          <div id="log-area" style="margin-top:10px;"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <p class="card-title">Carbon offset &amp; avoidance projects</p>
+        <p class="card-note">AI-estimated emissions avoided by initiatives Elitez has already implemented. These are estimates based on general assumptions, not certified carbon credits — useful for internal tracking, not for offset claims in a formal disclosure.</p>
+
+        <div class="grid g3" id="offset-summary" style="margin-bottom:4px;">
+          <div class="card" style="background:#F0F2F8;">
+            <p class="card-title">Total estimated avoided</p>
+            <p class="stat-figure" id="offset-total" style="font-size:26px;">9.08<span>tCO₂e / yr</span></p>
+            <p class="stat-sub">≈15.7% of AY23/24 total footprint</p>
+          </div>
+          <div class="card" style="background:#F0F2F8;">
+            <p class="card-title">Active projects</p>
+            <p class="stat-figure" id="offset-count" style="font-size:26px;">6</p>
+            <p class="stat-sub">Logged initiatives</p>
+          </div>
+          <div class="card" style="background:#F0F2F8;">
+            <p class="card-title">Verification status</p>
+            <p class="stat-figure" style="font-size:26px;color:var(--amber);">Estimated</p>
+            <p class="stat-sub">Not third-party verified</p>
+          </div>
+        </div>
+
+        <div id="offset-list">
+          <div class="grade-card">
+            <div class="grade-head"><span>E-Namecards (NFC)</span><span class="grade-badge b">0.08 tCO₂e/yr</span></div>
+            <div class="grade-body">Replaces printed name cards with reusable NFC cards, eliminating recurring paper and print-run emissions.<br><span style="color:var(--ink-faint);font-size:11px;">AI estimate — based on average paper/print carbon footprint per employee, avoided reprints.</span></div>
+          </div>
+          <div class="grade-card">
+            <div class="grade-head"><span>Aquaponics &amp; Urban Farm (2,000 sqft)</span><span class="grade-badge b">0.50 tCO₂e/yr</span></div>
+            <div class="grade-body">On-site produce reduces transport distance and packaging associated with purchased food for pantry/events.<br><span style="color:var(--ink-faint);font-size:11px;">AI estimate — based on typical food-mile emissions avoided for equivalent produce volume.</span></div>
+          </div>
+          <div class="grade-card">
+            <div class="grade-head"><span>Electric Vehicle Ownership Programme</span><span class="grade-badge b">1.20 tCO₂e/yr</span></div>
+            <div class="grade-body">SkillsFuture-funded EV training and employee EV ownership programme, promoting a shift from ICE to electric personal vehicles.<br><span style="color:var(--ink-faint);font-size:11px;">AI estimate — based on standard ICE-vs-EV emissions differential per adopted vehicle.</span></div>
+          </div>
+          <div class="grade-card">
+            <div class="grade-head"><span>Smart Switches &amp; Auto-Timers</span><span class="grade-badge b">2.10 tCO₂e/yr</span></div>
+            <div class="grade-body">Auto-timers on common-area lighting (e.g. toilets) cut unnecessary electricity draw across office units.<br><span style="color:var(--ink-faint);font-size:11px;">AI estimate — based on ~5% reduction applied to Scope 2 electricity baseline.</span></div>
+          </div>
+          <div class="grade-card">
+            <div class="grade-head"><span>Work-From-Anywhere Policy</span><span class="grade-badge b">3.40 tCO₂e/yr</span></div>
+            <div class="grade-body">Flexible remote-work policy reduces daily commuting emissions across the workforce.<br><span style="color:var(--ink-faint);font-size:11px;">AI estimate — based on estimated reduced commuting days per employee per year.</span></div>
+          </div>
+          <div class="grade-card">
+            <div class="grade-head"><span>Economy-Class Air Travel Policy</span><span class="grade-badge b">1.80 tCO₂e/yr</span></div>
+            <div class="grade-body">Default economy-class booking for business travel instead of premium cabins, maximising passenger-capacity efficiency.<br><span style="color:var(--ink-faint);font-size:11px;">AI estimate — based on the economy-vs-business emissions factor differential on flown routes.</span></div>
+          </div>
+        </div>
+
+        <p class="card-title" style="margin-top:18px;">Add a new project</p>
+        <div class="form-row-2">
+          <div class="form-field"><label>Project name</label><input type="text" id="offset-name" placeholder="e.g. Solar panel pilot"></div>
+          <div class="form-field"><label>Category</label>
+            <select id="offset-cat">
+              <option>Energy efficiency</option>
+              <option>Avoided travel/commuting</option>
+              <option>Waste reduction</option>
+              <option>Renewable energy</option>
+              <option>Sequestration / greening</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-field"><label>Short description</label><input type="text" id="offset-desc" placeholder="What the project does"></div>
+        <div class="upload-zone" id="offset-upload" onclick="pickFile('offset')">📎 Attach supporting evidence (optional)</div>
+        <button class="btn btn-primary" onclick="estimateOffset()">Estimate offset with AI</button>
+        <div id="offset-analyzing" style="display:none;font-size:12px;color:var(--ink-soft);padding:10px 0;">Reading project details — estimating avoided emissions…</div>
+      </div>
+    </div>
+
+    <!-- ============ CREDENTIALS ============ -->
+    <div class="view" id="view-credentials">
+      <div class="card">
+        <p class="card-title">Credentials &amp; certifications</p>
+        <p class="card-note">Upload and manage the certificates that back your framework alignment claims — tagged by which pillar they support.</p>
+        <div class="cert-grid" id="cred-grid">
+          <div class="cert-item done"><span class="cn">ISO 14001:2015 <span class="pillar-tag e">E</span></span><span class="cd">Certified · Environmental mgmt</span></div>
+          <div class="cert-item done"><span class="cn">LowCarbonSG <span class="pillar-tag e">E</span></span><span class="cd">Participant</span></div>
+          <div class="cert-item progress"><span class="cn">EcoVadis <span class="pillar-tag e">E</span><span class="pillar-tag s">S</span><span class="pillar-tag g">G</span></span><span class="cd">Silver, 2023 — cross-pillar rating</span></div>
+          <div class="cert-item done"><span class="cn">CPLC Singapore <span class="pillar-tag e">E</span></span><span class="cd">Member since Aug 2022</span></div>
+          <div class="cert-item done"><span class="cn">BizSAFE Level 3 <span class="pillar-tag s">S</span></span><span class="cd">Awarded · WSH Council</span></div>
+          <div class="cert-item done"><span class="cn">ISO 9001:2015 <span class="pillar-tag g">G</span></span><span class="cd">Certified · Quality mgmt</span></div>
+          <div class="cert-item done"><span class="cn">DPTM <span class="pillar-tag g">G</span></span><span class="cd">Certified, Mar 2024</span></div>
+          <div class="cert-item done"><span class="cn">SG Cyber Essential Mark <span class="pillar-tag g">G</span></span><span class="cd">Awarded</span></div>
+          <div class="cert-item done"><span class="cn">UN Global Compact <span class="pillar-tag g">G</span></span><span class="cd">Signatory, 10 Principles</span></div>
+        </div>
+
+        <p class="card-title" style="margin-top:18px;">Add a credential</p>
+        <div class="form-row-2">
+          <div class="form-field"><label>Certificate / credential name</label><input type="text" id="cred-name" placeholder="e.g. Green Mark Certification"></div>
+          <div class="form-field"><label>Issuing body</label><input type="text" id="cred-issuer" placeholder="e.g. BCA"></div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-field"><label>Pillar</label>
+            <select id="cred-pillar">
+              <option value="e">Environmental</option>
+              <option value="s">Social</option>
+              <option value="g">Governance</option>
+            </select>
+          </div>
+          <div class="form-field"><label>Date achieved</label><input type="date" id="cred-date"></div>
+        </div>
+        <div class="upload-zone" id="cred-upload" onclick="pickFile('cred')">📎 Upload certificate file</div>
+        <button class="btn btn-primary" onclick="addCredential()">Add credential</button>
+      </div>
+    </div>
+
+    <!-- ============ SOCIAL ============ -->
+    <div class="view" id="view-social">
+      <div class="grid g2e">
+        <div class="card">
+          <p class="card-title">Workforce — company-wide</p>
+          <p class="card-note">From your 2023 ESG Report.</p>
+          <div class="form-row-2">
+            <div class="form-field"><label>Total employees</label><input type="number" id="soc-total" value="150"></div>
+            <div class="form-field"><label>Female employees</label><input type="number" id="soc-female" value="72"></div>
+          </div>
+          <div class="form-field"><label>Gender ratio (male:female)</label><input value="13:12" readonly></div>
+          <button class="btn btn-primary" onclick="computeSocial()">Save &amp; compute</button>
+        </div>
+        <div class="card">
+          <p class="card-title">Gender ratio in management</p>
+          <p class="card-note">Not currently broken out in your reports — needed as a baseline for the "women in leadership +15% in 3 years" target.</p>
+          <div class="form-row-2">
+            <div class="form-field"><label>Management headcount</label><input type="number" id="soc-mgmt-total" placeholder="Not yet tracked"></div>
+            <div class="form-field"><label>Female in management</label><input type="number" id="soc-mgmt-female" placeholder="Not yet tracked"></div>
+          </div>
+          <button class="btn btn-outline" onclick="computeSocial()">Save management split</button>
+        </div>
+      </div>
+
+      <div class="grid g3">
+        <div class="card">
+          <p class="card-title">Female representation</p>
+          <p class="stat-figure" id="cm-female" style="font-size:28px;">48.0%</p>
+          <p class="stat-sub">Company-wide</p>
+        </div>
+        <div class="card">
+          <p class="card-title">Female representation — management</p>
+          <p class="stat-figure" id="cm-mgmt-female" style="font-size:28px;">Not tracked</p>
+          <p class="stat-sub">Baseline pending</p>
+        </div>
+        <div class="card">
+          <p class="card-title">Training, FY2023</p>
+          <p class="stat-figure" style="font-size:28px;">4,200<span>hrs</span></p>
+          <p class="stat-sub">105 employees completed courses</p>
+        </div>
+      </div>
+
+      <div class="grid g2e">
+        <div class="card">
+          <p class="card-title">Community &amp; CSR — FY24</p>
+          <div class="milestone"><span class="m-dot"></span><div>HR Learning Fest 2024 — participated</div></div>
+          <div class="milestone"><span class="m-dot"></span><div>Singapore Polytechnic Endowed Donation Bursary — sponsored</div></div>
+          <div class="milestone"><span class="m-dot"></span><div>'Help The Helpers' Programme, Sri Sathya Sai Society</div></div>
+        </div>
+        <div class="card">
+          <p class="card-title">Social targets — set on Company Profile</p>
+          <div class="action-row"><span class="action-num">1</span><span id="tgt-leadership">Women in leadership roles +15% within 3 years</span></div>
+          <div class="action-row"><span class="action-num">2</span><span id="tgt-upskill">Upskill 50% of workforce over 5 years</span></div>
+          <div class="action-row"><span class="action-num">3</span><span id="tgt-underrep">+10% representation of underrepresented groups</span></div>
+          <div class="action-row"><span class="action-num">4</span><span id="tgt-absentee">-20% health-related absenteeism</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ GOVERNANCE ============ -->
+    <div class="view" id="view-governance">
+      <div class="card">
+        <p class="card-title">Governance commitments (real, as reported)</p>
+        <div class="grid g3" style="margin-bottom:0;">
+          <div class="action-row"><span class="action-num">✓</span><span>All staff complete the PDPA course</span></div>
+          <div class="action-row"><span class="action-num">✓</span><span>Data Protection Officer appointed</span></div>
+          <div class="action-row"><span class="action-num">✓</span><span>Whistleblowing Scheme adopted</span></div>
+          <div class="action-row"><span class="action-num">✓</span><span>Ethical Standards Guide in place</span></div>
+          <div class="action-row"><span class="action-num">✓</span><span>UNGC Principle 10 (Anti-Corruption)</span></div>
+          <div class="action-row"><span class="action-num">✓</span><span>Board-level ESG oversight</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <p class="card-title">AI policy review</p>
+        <p class="card-note">Illustrative examples: your actual policy documents weren't shared, so these show how the feature reads and grades a policy rather than a real review of Elitez's documents.</p>
+
+        <div class="grid g2e">
+          <div class="grade-card">
+            <div class="grade-head"><span>Anti-Corruption Policy.pdf</span><span class="grade-badge b">B+ · 78</span></div>
+            <div class="grade-body">
+              <div class="grade-item"><span>✓</span><span>Reporting channel clearly defined</span></div>
+              <div class="grade-item"><span>✓</span><span>Disciplinary consequences stated</span></div>
+              <div class="grade-item"><span>✓</span><span>Applies to third parties &amp; agents</span></div>
+              <div class="grade-item gap"><span>!</span><span>No gift/hospitality value threshold specified</span></div>
+              <div class="grade-item gap"><span>!</span><span>No stated periodic review cycle</span></div>
+            </div>
+          </div>
+          <div class="grade-card">
+            <div class="grade-head"><span>Board Charter.pdf</span><span class="grade-badge a">A- · 88</span></div>
+            <div class="grade-body">
+              <div class="grade-item"><span>✓</span><span>Board composition &amp; independence criteria</span></div>
+              <div class="grade-item"><span>✓</span><span>Committee structure defined</span></div>
+              <div class="grade-item"><span>✓</span><span>Conflict-of-interest process</span></div>
+              <div class="grade-item gap"><span>!</span><span>No stated board diversity target</span></div>
+            </div>
+          </div>
+          <div class="grade-card">
+            <div class="grade-head"><span>Whistleblowing Policy.pdf</span><span class="grade-badge c">C · 55</span></div>
+            <div class="grade-body">
+              <div class="grade-item"><span>✓</span><span>Reporting channel named</span></div>
+              <div class="grade-item gap"><span>!</span><span>No anti-retaliation clause</span></div>
+              <div class="grade-item gap"><span>!</span><span>No investigation timeline stated</span></div>
+              <div class="grade-item gap"><span>!</span><span>Not endorsed by the board</span></div>
+            </div>
+          </div>
+          <div class="grade-card">
+            <div class="grade-head"><span>Data Protection Policy.pdf</span><span class="grade-badge a">A · 91</span></div>
+            <div class="grade-body">
+              <div class="grade-item"><span>✓</span><span>DPO named and contactable</span></div>
+              <div class="grade-item"><span>✓</span><span>Data breach notification process defined</span></div>
+              <div class="grade-item"><span>✓</span><span>Aligned to PDPA and DPTM requirements</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="upload-zone" onclick="showToast('Demo only — no document processed.')">📎 Upload a policy document to try this</div>
+      </div>
+    </div>
+
+    <!-- ============ SUPPLIERS ============ -->
+    <div class="view" id="view-suppliers">
+      <p class="card-note" style="margin:0 0 16px;">Concept screen — a proposal set of example suppliers showing how Elitez could chase Scope 3 value-chain data, not a real vendor list.</p>
+
+      <div class="grid g3">
+        <div class="card" style="background:#F0F2F8;">
+          <p class="card-title">Suppliers invited</p>
+          <p class="stat-figure" style="font-size:30px;">9<span>/ 10</span></p>
+          <p class="stat-sub">90% of value-chain vendors contacted</p>
+        </div>
+        <div class="card" style="background:#F0F2F8;">
+          <p class="card-title">Response rate</p>
+          <p class="stat-figure" style="font-size:30px;">60%</p>
+          <p class="stat-sub">6 responded · 3 pending · 1 not yet invited</p>
+        </div>
+        <div class="card" style="background:#F0F2F8;">
+          <p class="card-title">Aggregated supplier footprint</p>
+          <p class="stat-figure" style="font-size:30px;">30.5<span>tCO₂e / yr</span></p>
+          <p class="stat-sub">From 6 responded suppliers · avg ESG score 75</p>
+        </div>
+      </div>
+
+      <div class="grid g2">
+        <div class="card">
+          <p class="card-title">Supplier roster</p>
+          <table class="data-table">
+            <tr><th>Supplier</th><th>Category</th><th>Est. footprint</th><th>ESG score</th><th>Status</th></tr>
+            <tr><td>CT Hub Facilities Management</td><td>Facilities / landlord</td><td>12.4 tCO₂e</td><td>78</td><td><span class="badge verified">Responded</span></td></tr>
+            <tr><td>Kallang Business Travel Agency</td><td>Corporate travel</td><td>8.6 tCO₂e</td><td>65</td><td><span class="badge verified">Responded</span></td></tr>
+            <tr><td>Meridian Catering Co.</td><td>Pantry &amp; catering</td><td>4.8 tCO₂e</td><td>60</td><td><span class="badge verified">Responded</span></td></tr>
+            <tr><td>Horizon HR Software Solutions</td><td>IT / cloud software</td><td>3.1 tCO₂e</td><td>82</td><td><span class="badge verified">Responded</span></td></tr>
+            <tr><td>EVCharge Solutions SG</td><td>EV charging / leasing</td><td>1.2 tCO₂e</td><td>90</td><td><span class="badge verified">Responded</span></td></tr>
+            <tr><td>Straits Urban Farm Supplies</td><td>Produce / aquaponics</td><td>0.4 tCO₂e</td><td>74</td><td><span class="badge verified">Responded</span></td></tr>
+            <tr><td>GreenClean Facilities Services</td><td>Office cleaning</td><td>—</td><td>—</td><td><span class="badge estimated">Pending</span></td></tr>
+            <tr><td>PrintWorks Stationery Supplies</td><td>Office supplies</td><td>—</td><td>—</td><td><span class="badge estimated">Pending</span></td></tr>
+            <tr><td>BlueWave Cybersecurity Services</td><td>IT / security</td><td>—</td><td>—</td><td><span class="badge estimated">Pending</span></td></tr>
+            <tr><td>NexaTel Business Communications</td><td>Telecom</td><td>—</td><td>—</td><td><span style="color:var(--ink-faint);font-size:11px;">Not invited</span></td></tr>
+          </table>
+        </div>
+
+        <div class="card">
+          <p class="card-title">Footprint by category</p>
+          <div class="score-row"><span>Facilities</span><span>12.4 t</span></div>
+          <div class="score-track" style="width:100%;margin-bottom:8px;"><div class="score-fill" style="width:100%;"></div></div>
+          <div class="score-row"><span>Corporate travel</span><span>8.6 t</span></div>
+          <div class="score-track" style="width:100%;margin-bottom:8px;"><div class="score-fill" style="width:69%;"></div></div>
+          <div class="score-row"><span>Catering</span><span>4.8 t</span></div>
+          <div class="score-track" style="width:100%;margin-bottom:8px;"><div class="score-fill" style="width:39%;"></div></div>
+          <div class="score-row"><span>IT / software</span><span>3.1 t</span></div>
+          <div class="score-track" style="width:100%;margin-bottom:8px;"><div class="score-fill" style="width:25%;"></div></div>
+          <div class="score-row"><span>EV / energy</span><span>1.2 t</span></div>
+          <div class="score-track" style="width:100%;margin-bottom:8px;"><div class="score-fill" style="width:10%;"></div></div>
+          <div class="score-row"><span>Produce</span><span>0.4 t</span></div>
+          <div class="score-track" style="width:100%;"><div class="score-fill" style="width:3%;"></div></div>
+
+          <p class="card-title" style="margin-top:20px;">Highlights</p>
+          <div class="action-row"><span class="action-num">★</span><span>EVCharge Solutions SG has the highest supplier ESG score (90) and lowest footprint per dollar spent</span></div>
+          <div class="action-row"><span class="action-num">!</span><span>Corporate travel is the largest responded contributor after facilities — worth a direct reduction conversation</span></div>
+          <div class="action-row"><span class="action-num">!</span><span>3 suppliers pending, 1 not yet invited — chasing these would extend coverage to ~100%</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <p class="card-title">Chase outstanding suppliers</p>
+        <div style="display:flex;gap:12px;margin-top:6px;">
+          <button class="btn btn-primary" onclick="showToast('Reminder sent to 3 pending suppliers.')">Send reminder to pending suppliers</button>
+          <button class="btn btn-outline" onclick="showToast('Invite drafted for NexaTel Business Communications.')">Invite NexaTel Business Communications</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ REPORT ============ -->
+    <div class="view" id="view-report">
+      <div class="card" style="background:var(--navy-deep);border-color:var(--navy-deep);display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:16px;">
+        <div>
+          <p class="card-title" style="color:rgba(255,255,255,0.6);margin-bottom:4px;">Real deliverable</p>
+          <p style="color:#fff;font-size:13px;margin:0;line-height:1.5;">The full report is also available as an actual, editable Word document — cover page, narrative, and all tables below — built from this same data.</p>
+        </div>
+        <a href="Elitez_ESG_Carbon_Report_AY25-26.docx" download style="text-decoration:none;flex-shrink:0;">
+          <button class="btn btn-primary">⬇ Download Word report</button>
+        </a>
+      </div>
+
+      <div class="report-doc" style="padding:0;overflow:hidden;">
+        <div class="rpt-cover">
+          <div class="mark">ELI<span>+</span>EZ</div>
+          <div class="tag">GROUP OF COMPANIES</div>
+          <h1>Environmental, Social &amp; Governance Report</h1>
+          <p class="sub1">Elitez Pte Ltd · Prepared with reference to the GRI Standards, TCFD and UN Global Compact</p>
+          <p class="sub2">AY25/26 (demo period label) — figures shown are Elitez's actual reported AY23/24 data</p>
+        </div>
+
+        <div style="padding:8px 44px 44px;">
+
+          <div class="rpt-toc">
+            <a href="#">About this report <span>04</span></a>
+            <a href="#">Part 5 — Value chain &amp; suppliers <span>13</span></a>
+            <a href="#">Part 1 — About Elitez <span>05</span></a>
+            <a href="#">Part 6 — GRI content index <span>15</span></a>
+            <a href="#">Part 2 — Environmental performance <span>06</span></a>
+            <a href="#">Part 7 — Appendix <span>16</span></a>
+            <a href="#">Part 3 — Social performance <span>10</span></a>
+            <a href="#">Looking ahead &amp; references <span>17</span></a>
+            <a href="#">Part 4 — Governance <span>11</span></a>
+          </div>
+
+          <div class="rpt-part" style="border-top:none;margin-top:24px;">
+            <span class="pn">—</span><h2>About this report</h2>
+          </div>
+          <p class="rpt-body">This report presents Elitez Pte Ltd's environmental, social and governance performance, prepared with reference to the GRI Standards, the Task Force on Climate-related Financial Disclosures (TCFD), and the Ten Principles of the UN Global Compact. It covers the Group's Singapore operations and is intended for employees, clients, investors and regulators seeking a transparent account of the company's sustainability position.</p>
+          <p class="rpt-body">Environmental figures are calculated with reference to the GHG Protocol, using the Global Compact Network Singapore (GCNSG) Carbon and Emissions Recording Tool. Where an initiative's impact is estimated rather than measured from primary data, this is stated explicitly rather than presented as verified performance.</p>
+
+          <p class="rpt-sub">Company snapshot</p>
+          <table class="data-table" style="margin-bottom:14px;">
+            <tr><th>Attribute</th><th>Value</th></tr>
+            <tr><td>Legal entity</td><td>Elitez Pte Ltd (Elitez Group of Companies)</td></tr>
+            <tr><td>Industry</td><td>HR &amp; workforce solutions</td></tr>
+            <tr><td>Founded</td><td>2010, Singapore</td></tr>
+            <tr><td>Company size</td><td>Medium (50–200 employees)</td></tr>
+            <tr><td>Total employees</td><td>150</td></tr>
+            <tr><td>Offices</td><td>7 units, Kallang Avenue, Singapore</td></tr>
+            <tr><td>Annual revenue (AY23/24)</td><td>SGD 48,130,435</td></tr>
+            <tr><td>Reporting period</td><td>AY25/26 (demo label) / AY23/24 (actual data)</td></tr>
+          </table>
+
+          <div class="quote-box">
+            <p>"Sustainability is not a side project for us — it's a discipline we're building the same way we built our HR practice: methodically, with real data, and with room to say plainly where we still have work to do."</p>
+            <p class="qa">— Elitez ESG Leadership</p>
+          </div>
+
+          <div class="pull-stats">
+            <div class="pull-stat"><div class="pv">150</div><div class="pl">Employees across 7 Singapore offices</div></div>
+            <div class="pull-stat"><div class="pv">57.7t</div><div class="pl">Total GHG emissions, CO₂e</div></div>
+            <div class="pull-stat"><div class="pv">48%</div><div class="pl">Female representation, company-wide</div></div>
+            <div class="pull-stat"><div class="pv">9</div><div class="pl">Active certifications &amp; framework memberships</div></div>
+          </div>
+
+          <div class="rpt-divider">
+            <div class="dn">PART 1</div>
+            <h2>About Elitez</h2>
+          </div>
+          <p class="rpt-body">Elitez Group of Companies is a regional human resources firm founded in Singapore in 2010, providing full-suite HR solutions — recruitment and manpower outsourcing, business process outsourcing, HR administration, outplacement and learning &amp; development — to clients across healthcare, IT, logistics, FMCG, security and government services. The Group combines local expertise with regional reach to serve clients throughout Southeast Asia, guided by its mission to "fulfil human potential without borders."</p>
+          <p class="rpt-body">Elitez Pte Ltd, the Group's primary operating subsidiary, employs 150 people across 7 office units in Singapore. The company frames its responsibilities around three commitments it calls the 3Ps — People, Planet and Profit — recognising that as a service-based business, its greatest sustainability lever is the wellbeing and conduct of its own workforce, alongside the operational footprint of its offices.</p>
+          <p class="rpt-sub">Stakeholder relationships</p>
+          <p class="rpt-body">The company organises its stakeholder relationships into three categories: contractual relationships with shareholders, clients and partners; support relationships with employees and suppliers; and influencing relationships with government, media and the public. This structure underpins how ESG priorities are weighed against day-to-day business decisions.</p>
+
+          <div class="rpt-divider">
+            <div class="dn">PART 2</div>
+            <h2>Environmental performance</h2>
+          </div>
+          <p class="rpt-body">Total greenhouse gas emissions for the period were 57,689.83 kg CO₂e, an increase of 8.7% on the prior year, comprising Scope 2 (purchased electricity, 72.8%) and Scope 3 (water consumption and business air travel, 27.2%). Elitez does not own transport or non-transport assets and therefore reports no Scope 1 emissions. This is the third consecutive year emissions have been measured, giving the company a genuine multi-year baseline rather than a single snapshot.</p>
+          <table class="data-table" style="margin-bottom:14px;">
+            <tr><th>Metric</th><th>Value</th></tr>
+            <tr><td>Total GHG emissions</td><td>57,689.83 kg CO₂e</td></tr>
+            <tr><td>Scope 2 — purchased electricity</td><td>41,971.24 kg CO₂e</td></tr>
+            <tr><td>Scope 3 — water &amp; air travel</td><td>15,709.59 kg CO₂e</td></tr>
+            <tr><td>Carbon intensity</td><td>1.2 kg CO₂e / SGD 1,000 revenue</td></tr>
+            <tr><td>Net-zero target</td><td>2050 (carbon neutral by 2030)</td></tr>
+          </table>
+          <p class="rpt-sub">Three-year trend</p>
+          <p class="rpt-body">The sharp rise in Scope 3 emissions between AY21/22 and AY22/23 (+2,360%) reflects the resumption of business air travel following pandemic-related restrictions. Growth has since moderated: Scope 2 rose 5.6% and Scope 3 rose 18.4% in the most recent year, suggesting the initial rebound is stabilising into steadier, more manageable growth.</p>
+          <div id="trend-chart-report" style="margin:12px 0 16px;"></div>
+          <table class="data-table" style="margin-bottom:14px;">
+            <tr><th>Year</th><th>Scope 2 (kg)</th><th>Scope 3 (kg)</th><th>Total (kg)</th></tr>
+            <tr><td>AY21/22 (baseline)</td><td>28,262.86</td><td>1,040.35</td><td>29,303.21</td></tr>
+            <tr><td>AY22/23</td><td>39,737.15</td><td>13,351.85</td><td>53,089.00</td></tr>
+            <tr><td>AY23/24</td><td>41,971.24</td><td>15,709.59</td><td>57,689.83</td></tr>
+          </table>
+          <p class="rpt-sub">Path to target &amp; recommendations</p>
+          <p class="rpt-body">Measured against the AY21/22 baseline, Scope 2 emissions would need to fall to approximately 14,131 kg CO₂e to meet the 2030 target (-50%) — a further 66% reduction from the current 41,971 kg. The single highest-leverage lever available is the 100% renewable electricity commitment; achieving it would address the majority of this gap directly.</p>
+          <div class="quote-box" style="border-left-color:var(--missing);">
+            <p style="color:var(--ink);font-style:normal;">A caution on the Scope 3 target: the AY21/22 baseline (1,040 kg CO₂e) was recorded during pandemic-era travel restrictions and does not reflect typical operating conditions. Measured against it, the current -20% target would require Scope 3 to fall to roughly 832 kg — over 18x below the current AY23/24 figure of 15,710 kg. This target is likely no longer realistic as set, and should be recalibrated against a representative post-pandemic baseline year before being used to track progress.</p>
+          </div>
+          <p class="rpt-body">Recommended next actions: (1) re-baseline the Scope 3 target against AY22/23 or AY23/24 rather than AY21/22; (2) prioritise the supplier engagement programme in Part 5, since value-chain travel and facilities are the largest addressable categories; (3) continue the emissions-avoidance initiatives below, which are already estimated to offset roughly 16% of the annual footprint.</p>
+          <p class="rpt-sub">Emissions avoidance initiatives</p>
+          <p class="rpt-body">Six operational initiatives are estimated to avoid approximately 9.08 tCO₂e annually, led by the Work-From-Anywhere policy and smart-switch energy management. These figures are internal estimates based on general assumptions, not measurements against a certified methodology, and are reported here as an internal management tool rather than as verified carbon offsets.</p>
+          <table class="data-table" style="margin-bottom:14px;" id="report-offset-table">
+            <tr><th>Initiative</th><th>Est. avoided</th></tr>
+            <tr><td>Work-From-Anywhere policy</td><td>3.40 tCO₂e/yr</td></tr>
+            <tr><td>Smart switches &amp; auto-timers</td><td>2.10 tCO₂e/yr</td></tr>
+            <tr><td>Economy-class air travel policy</td><td>1.80 tCO₂e/yr</td></tr>
+            <tr><td>EV ownership programme</td><td>1.20 tCO₂e/yr</td></tr>
+            <tr><td>Aquaponics &amp; urban farm</td><td>0.50 tCO₂e/yr</td></tr>
+            <tr><td>E-namecards (NFC)</td><td>0.08 tCO₂e/yr</td></tr>
+            <tr><td>Total</td><td id="report-offset-total">9.08 tCO₂e/yr</td></tr>
+          </table>
+          <p class="rpt-sub">Climate-related risk</p>
+          <p class="rpt-body">Physical risks, such as extreme weather disrupting office operations, are managed through business continuity plans that include remote-working provisions. Transition risks — principally rising compliance costs from carbon-related regulation, and reputational exposure if ESG expectations are not met — are monitored on an ongoing basis and addressed through the certifications and disclosures set out in this report.</p>
+          <div class="quote-box">
+            <p>Scope 3 emissions remain the hardest category to monitor across the industry: there is no strict regulatory requirement in Singapore mandating full value-chain disclosure, and most companies concentrate reduction efforts on Scope 1 and 2, where data is easier to collect. Elitez's decision to track water consumption and business air travel under Scope 3 already puts it ahead of many peers on this front — though, as above, genuine improvement will depend on extending that visibility further into the supply chain.</p>
+            <p class="qa">— Industry context note</p>
+          </div>
+          <p class="rpt-sub">Data sources &amp; conversion factors</p>
+          <table class="data-table">
+            <tr><th>Data source</th><th>Used for</th></tr>
+            <tr><td>Energy Market Authority factor (0.4080 kg CO₂/kWh)</td><td>Scope 2 — electricity</td></tr>
+            <tr><td>GCNSG factor (1.30 kg CO₂/m³)</td><td>Scope 3 — water consumption</td></tr>
+            <tr><td>ICAO Carbon Emissions Calculator</td><td>Scope 3 — business air travel</td></tr>
+            <tr><td>GCNSG Carbon and Emissions Recording Tool</td><td>Overall inventory compilation</td></tr>
+          </table>
+
+          <div class="rpt-divider">
+            <div class="dn">PART 3</div>
+            <h2>Social performance</h2>
+          </div>
+          <p class="rpt-body">Elitez employs 150 people with a company-wide gender ratio of 13:12 (male:female), equivalent to 48.0% female representation. 4,200 training hours were delivered across 105 employees this period, spanning courses in leadership, change management, and workplace safety. Female representation in management is not yet tracked separately from the company-wide figure — establishing this baseline is a stated priority, since it is the metric against which the company's own commitment to increase women in leadership by 15% within three years will need to be measured.</p>
+          <table class="data-table" style="margin-bottom:14px;">
+            <tr><th>Metric</th><th>Value</th></tr>
+            <tr><td>Total employees</td><td>150</td></tr>
+            <tr><td>Female representation (company-wide)</td><td>48.0%</td></tr>
+            <tr><td>Female representation (management)</td><td>Not yet tracked</td></tr>
+            <tr><td>Training hours delivered</td><td>4,200 hrs (105 employees)</td></tr>
+          </table>
+          <p class="rpt-sub">Community engagement — multi-year timeline</p>
+          <p class="rpt-body">Community engagement has been a consistent feature of the company's social programme since 2022, spanning donation drives, environmental clean-ups and, most recently, education and social-support partnerships.</p>
+          <table class="data-table">
+            <tr><th>Period</th><th>Initiative</th></tr>
+            <tr><td>2022</td><td>Soles4Souls Shoe Donation; CNY Care Pack Distribution; Elitez Blood Donation Drive; PAssion Wave Kayak N Klean; Blossom Seed Charity Walk; Kebun Baru Health 100</td></tr>
+            <tr><td>2023</td><td>HSA Blood Donation Drive; Boystown Donation Drive; Lions Club North West Service Week+ pop-up market</td></tr>
+            <tr><td>FY24 (present)</td><td>HR Learning Fest 2024; Singapore Polytechnic Endowed Donation Bursary; 'Help The Helpers' Programme with Sri Sathya Sai Society</td></tr>
+          </table>
+
+          <div class="rpt-divider">
+            <div class="dn">PART 4</div>
+            <h2>Governance</h2>
+          </div>
+          <p class="rpt-body">Elitez holds nine active certifications spanning environmental management, quality management, workplace safety and data protection, alongside a whistleblowing scheme, an ethical standards guide, and a commitment to UN Global Compact Principle 10 on anti-corruption.</p>
+          <table class="data-table" style="margin-bottom:14px;" id="report-cred-table">
+            <tr><th>Credential</th><th>Status</th></tr>
+            <tr><td>ISO 14001:2015</td><td>Certified</td></tr>
+            <tr><td>ISO 9001:2015</td><td>Certified</td></tr>
+            <tr><td>BizSAFE Level 3</td><td>Awarded</td></tr>
+            <tr><td>EcoVadis</td><td>Silver, 2023</td></tr>
+            <tr><td>LowCarbonSG</td><td>Participant</td></tr>
+            <tr><td>CPLC Singapore</td><td>Member since Aug 2022</td></tr>
+            <tr><td>DPTM</td><td>Certified, Mar 2024</td></tr>
+            <tr><td>UN Global Compact</td><td>Signatory, 10 Principles</td></tr>
+          </table>
+          <p class="rpt-sub">Policy review — detailed findings</p>
+          <p class="rpt-body">Key internal policies are assessed against common governance criteria — what is covered, what is missing, and what would need to be addressed for each to be considered complete. Full findings for each policy are below.</p>
+          <table class="data-table" style="margin-bottom:6px;">
+            <tr><th colspan="2">Board Charter.pdf — Grade A- (88/100)</th></tr>
+            <tr><td>Covers</td><td>Board composition &amp; independence criteria; committee structure defined; conflict-of-interest process</td></tr>
+            <tr><td>Gaps</td><td>No stated board diversity target</td></tr>
+          </table>
+          <table class="data-table" style="margin-bottom:6px;">
+            <tr><th colspan="2">Data Protection Policy.pdf — Grade A (91/100)</th></tr>
+            <tr><td>Covers</td><td>DPO named and contactable; data breach notification process defined; aligned to PDPA and DPTM requirements</td></tr>
+            <tr><td>Gaps</td><td>None identified</td></tr>
+          </table>
+          <table class="data-table" style="margin-bottom:6px;">
+            <tr><th colspan="2">Anti-Corruption Policy.pdf — Grade B+ (78/100)</th></tr>
+            <tr><td>Covers</td><td>Reporting channel clearly defined; disciplinary consequences stated; applies to third parties &amp; agents</td></tr>
+            <tr><td>Gaps</td><td>No gift/hospitality value threshold specified; no stated periodic review cycle</td></tr>
+          </table>
+          <table class="data-table">
+            <tr><th colspan="2">Whistleblowing Policy.pdf — Grade C (55/100)</th></tr>
+            <tr><td>Covers</td><td>Reporting channel named</td></tr>
+            <tr><td>Gaps</td><td>No anti-retaliation clause; no investigation timeline stated; not endorsed by the board</td></tr>
+          </table>
+
+          <div class="rpt-divider">
+            <div class="dn">PART 5</div>
+            <h2>Value chain &amp; suppliers</h2>
+          </div>
+          <p class="rpt-body">Of 10 mapped suppliers across facilities, travel, catering, IT and energy, 9 have been invited to share ESG data and 6 have responded, representing an aggregated supplier footprint of approximately 30.5 tCO₂e/yr and an average supplier ESG score of 75. Facilities and corporate travel are the largest responded contributors, and are the priority categories for direct engagement on emissions reduction in the coming period.</p>
+          <table class="data-table">
+            <tr><th>Supplier</th><th>Category</th><th>Est. footprint</th><th>ESG score</th><th>Status</th></tr>
+            <tr><td>CT Hub Facilities Management</td><td>Facilities / landlord</td><td>12.4 tCO₂e</td><td>78</td><td>Responded</td></tr>
+            <tr><td>Kallang Business Travel Agency</td><td>Corporate travel</td><td>8.6 tCO₂e</td><td>65</td><td>Responded</td></tr>
+            <tr><td>Meridian Catering Co.</td><td>Pantry &amp; catering</td><td>4.8 tCO₂e</td><td>60</td><td>Responded</td></tr>
+            <tr><td>Horizon HR Software Solutions</td><td>IT / cloud software</td><td>3.1 tCO₂e</td><td>82</td><td>Responded</td></tr>
+            <tr><td>EVCharge Solutions SG</td><td>EV charging / leasing</td><td>1.2 tCO₂e</td><td>90</td><td>Responded</td></tr>
+            <tr><td>Straits Urban Farm Supplies</td><td>Produce / aquaponics</td><td>0.4 tCO₂e</td><td>74</td><td>Responded</td></tr>
+            <tr><td>GreenClean Facilities Services</td><td>Office cleaning</td><td>—</td><td>—</td><td>Pending</td></tr>
+            <tr><td>PrintWorks Stationery Supplies</td><td>Office supplies</td><td>—</td><td>—</td><td>Pending</td></tr>
+            <tr><td>BlueWave Cybersecurity Services</td><td>IT / security</td><td>—</td><td>—</td><td>Pending</td></tr>
+            <tr><td>NexaTel Business Communications</td><td>Telecom</td><td>—</td><td>—</td><td>Not invited</td></tr>
+          </table>
+
+          <div class="rpt-divider">
+            <div class="dn">PART 6</div>
+            <h2>GRI content index</h2>
+          </div>
+          <p class="rpt-body">The following discloses where each GRI topic is addressed within this report.</p>
+          <table class="data-table">
+            <tr><th>Disclosure</th><th>Topic</th><th>Reported in</th></tr>
+            <tr><td>GRI 2-1</td><td>Organisational details</td><td>Part 1 — About Elitez</td></tr>
+            <tr><td>GRI 2-9</td><td>Governance structure</td><td>Part 4 — Governance</td></tr>
+            <tr><td>GRI 2-16</td><td>Communication of critical concerns</td><td>Part 4 — Governance</td></tr>
+            <tr><td>GRI 302-1</td><td>Energy consumption</td><td>Part 2 — Environmental performance</td></tr>
+            <tr><td>GRI 305-1 / 305-2</td><td>Scope 1 &amp; 2 emissions</td><td>Part 2 — Environmental performance</td></tr>
+            <tr><td>GRI 305-3</td><td>Scope 3 emissions</td><td>Part 2 — Environmental performance</td></tr>
+            <tr><td>GRI 305-5</td><td>Reduction of GHG emissions</td><td>Part 2 — Emissions avoidance initiatives</td></tr>
+            <tr><td>GRI 401-1</td><td>New employee hires &amp; turnover</td><td>Not currently tracked</td></tr>
+            <tr><td>GRI 404-1</td><td>Average training hours</td><td>Part 3 — Social performance</td></tr>
+            <tr><td>GRI 405-1</td><td>Diversity of governance bodies</td><td>Part 3 — Social performance (baseline pending)</td></tr>
+            <tr><td>GRI 414</td><td>Supplier social assessment</td><td>Part 5 — Value chain &amp; suppliers</td></tr>
+          </table>
+
+          <div class="rpt-divider">
+            <div class="dn">PART 7</div>
+            <h2>Appendix</h2>
+          </div>
+          <p class="rpt-sub">Credentials by pillar</p>
+          <table class="data-table" style="margin-bottom:14px;">
+            <tr><th>Pillar</th><th>Credentials</th></tr>
+            <tr><td>Environmental</td><td>ISO 14001:2015, LowCarbonSG, CPLC Singapore, EcoVadis</td></tr>
+            <tr><td>Social</td><td>BizSAFE Level 3, EcoVadis</td></tr>
+            <tr><td>Governance</td><td>ISO 9001:2015, DPTM, SG Cyber Essential Mark, UN Global Compact, EcoVadis</td></tr>
+          </table>
+          <p class="rpt-sub">Recent platform activity</p>
+          <p class="rpt-body">The following is a live extract from the platform's audit trail at the time this report was generated, showing the most recent recorded actions.</p>
+          <div id="report-audit-list"></div>
+
+          <div class="rpt-divider">
+            <div class="dn">LOOKING AHEAD</div>
+            <h2>Conclusion &amp; next steps</h2>
+          </div>
+          <p class="rpt-body">Elitez has established a consistent three-year emissions baseline and introduced carbon intensity as a new efficiency metric this period. Three priorities stand out for the coming year:</p>
+          <table class="data-table" style="margin-bottom:6px;">
+            <tr><td style="width:36px;font-weight:700;color:var(--orange-deep);">1</td><td>Establish a gender-in-management baseline to make the leadership diversity target measurable</td></tr>
+            <tr><td style="font-weight:700;color:var(--orange-deep);">2</td><td>Progress toward 100% renewable electricity ahead of the Q4 2025 target</td></tr>
+            <tr><td style="font-weight:700;color:var(--orange-deep);">3</td><td>Continue supplier engagement to extend coverage beyond the current 60% response rate</td></tr>
+          </table>
+
+          <p class="rpt-sub" style="margin-top:26px;">References &amp; sources</p>
+          <p class="rpt-refs">GHG Protocol · Global Compact Network Singapore (GCNSG) Carbon and Emissions Recording Tool · Task Force on Climate-related Financial Disclosures (TCFD) · Science Based Targets initiative (SBTi) · GRI Standards · UN Global Compact · UN Sustainable Development Goals · ISO 14001:2015 · ISO 9001:2015 · EcoVadis · LowCarbonSG · Carbon Pricing Leadership Coalition (CPLC) Singapore</p>
+
+          <p style="font-size:11px;color:var(--ink-faint);font-style:italic;margin-top:22px;border-top:1px solid var(--line);padding-top:14px;">Draft for internal review, prepared with reference to the GRI Standards. Not a certified or externally assured report.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ AUDIT ============ -->
+    <div class="view" id="view-audit">
+      <div class="card">
+        <p class="card-title">Audit trail</p>
+        <div id="audit-list"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const navItems = document.querySelectorAll('.nav-item');
+  const views = { dashboard:'view-dashboard', profile:'view-profile', environmental:'view-environmental', social:'view-social', governance:'view-governance', credentials:'view-credentials', suppliers:'view-suppliers', report:'view-report', audit:'view-audit' };
+  navItems.forEach(item => item.addEventListener('click', () => {
+    navItems.forEach(n => n.classList.remove('active'));
+    item.classList.add('active');
+    Object.values(views).forEach(id => document.getElementById(id).classList.remove('active'));
+    document.getElementById(views[item.dataset.tab]).classList.add('active');
+  }));
+
+  document.querySelectorAll('.subtab').forEach(st => st.addEventListener('click', () => {
+    document.querySelectorAll('.subtab').forEach(s => s.classList.remove('active'));
+    st.classList.add('active');
+    document.querySelectorAll('.subview').forEach(v => v.classList.remove('active'));
+    document.getElementById('sub-' + st.dataset.sub).classList.add('active');
+  }));
+
+  const fileState = {};
+  function pickFile(id){
+    const zone = document.getElementById(id + '-upload');
+    zone.classList.add('has-file');
+    zone.textContent = '✓ Evidence attached';
+    fileState[id] = true;
+  }
+
+  function addEntry(scope, fixedFactor){
+    const qtyEl = document.getElementById(scope + '-qty');
+    const qty = parseFloat(qtyEl.value);
+    if (!qty || qty <= 0){ showToast('Enter a quantity first.'); return; }
+    let factor = fixedFactor;
+    let label = scope === 's2' ? 'Grid electricity' : 'Water consumption';
+    if (scope === 's3'){
+      const opt = document.getElementById('s3-cat').selectedOptions[0];
+      factor = parseFloat(opt.dataset.factor);
+      label = opt.value;
+      if (!factor){ showToast(label + ' emissions need the ICAO calculator — log manually for now.'); return; }
+    }
+    const kg = qty * factor;
+    const verified = !!fileState[scope];
+    const row = document.createElement('div');
+    row.className = 'log-row';
+    row.innerHTML = `<div>${label}<small>${qty.toLocaleString()} units</small></div><div>${kg.toFixed(2)} kg</div><div class="badge ${verified?'verified':'estimated'}">${verified?'Verified':'Estimated'}</div>`;
+    document.getElementById('log-area').prepend(row);
+    qtyEl.value = '';
+    fileState[scope] = false;
+    const zone = document.getElementById(scope + '-upload');
+    zone.classList.remove('has-file');
+    zone.textContent = scope === 's2' ? '📎 Attach SP Group bill' : '📎 Attach water bill / travel ticket';
+    showToast('Entry added — ' + kg.toFixed(2) + ' kg CO₂e');
+    logAudit(label + ' entry added — ' + kg.toFixed(2) + ' kg CO₂e (' + (verified?'verified':'estimated') + ')');
+  }
+
+  function computeSocial(){
+    const total = parseFloat(document.getElementById('soc-total').value) || 0;
+    const female = parseFloat(document.getElementById('soc-female').value) || 0;
+    if (total === 0){ showToast('Enter total employees first.'); return; }
+    document.getElementById('cm-female').textContent = (female/total*100).toFixed(1) + '%';
+
+    const mt = parseFloat(document.getElementById('soc-mgmt-total').value) || 0;
+    const mf = parseFloat(document.getElementById('soc-mgmt-female').value) || 0;
+    const mgmtEl = document.getElementById('cm-mgmt-female');
+    if (mt > 0){
+      mgmtEl.textContent = (mf/mt*100).toFixed(1) + '%';
+      logAudit('Management gender split saved — baseline for leadership diversity target');
+    } else {
+      mgmtEl.textContent = 'Not tracked';
+    }
+    showToast('Social metrics saved.');
+    logAudit('Workforce data saved — headcount and gender split updated');
+  }
+
+  let auditLog = [
+    { time:'20 Aug 2026, 9:14am', actor:'Andy Lim · Deputy Head, ESG', action:'Reviewed AY25/26 Carbon Footprint Report ahead of publication' },
+    { time:'3 Sep 2026, 4:20pm', actor:'Eugene Chua · ESG Asst. Manager', action:'Confirmed DPTM certification renewal, March 2024' },
+  ];
+  function renderAudit(){
+    const html = e => `<div class="milestone"><span class="m-dot"></span><div><strong style="color:var(--navy)">${e.actor}</strong> — ${e.action}<br><span style="color:var(--ink-faint);font-size:11px;">${e.time}</span></div></div>`;
+    const list = document.getElementById('audit-list');
+    if (list) list.innerHTML = auditLog.map(html).join('');
+    const reportList = document.getElementById('report-audit-list');
+    if (reportList) reportList.innerHTML = auditLog.slice(0, 5).map(html).join('');
+  }
+  function logAudit(action){
+    const now = new Date();
+    const time = now.toLocaleDateString('en-SG',{day:'numeric',month:'short',year:'numeric'}) + ', ' + now.toLocaleTimeString('en-SG',{hour:'numeric',minute:'2-digit'});
+    auditLog.unshift({ time, actor:'You · this session', action });
+    renderAudit();
+  }
+
+  function trendChartSVG(){
+    return `
+    <svg viewBox="0 0 440 226" style="width:100%;max-width:460px;display:block;">
+      <line x1="20" y1="113.6" x2="420" y2="113.6" stroke="#C6432B" stroke-dasharray="4,3" stroke-width="1.2"/>
+      <text x="418" y="108" text-anchor="end" font-size="9.5" fill="#C6432B" font-family="IBM Plex Mono">AY21/22 baseline · 29,303 kg</text>
+
+      <rect x="40" y="116.7" width="60" height="83.3" fill="#0E6B63"/>
+      <rect x="40" y="113.6" width="60" height="3.1" fill="#F0731E"/>
+      <text x="70" y="105" text-anchor="middle" font-size="10.5" fill="#17284D" font-family="IBM Plex Mono">29,303</text>
+      <text x="70" y="216" text-anchor="middle" font-size="10.5" fill="#5A6478">AY21/22</text>
+
+      <rect x="190" y="82.9" width="60" height="117.1" fill="#0E6B63"/>
+      <rect x="190" y="43.5" width="60" height="39.4" fill="#F0731E"/>
+      <text x="220" y="35" text-anchor="middle" font-size="10.5" fill="#17284D" font-family="IBM Plex Mono">53,089</text>
+      <text x="220" y="216" text-anchor="middle" font-size="10.5" fill="#5A6478">AY22/23</text>
+
+      <rect x="340" y="76.3" width="60" height="123.7" fill="#0E6B63"/>
+      <rect x="340" y="30" width="60" height="46.3" fill="#F0731E"/>
+      <text x="370" y="22" text-anchor="middle" font-size="10.5" fill="#17284D" font-family="IBM Plex Mono">57,690</text>
+      <text x="370" y="216" text-anchor="middle" font-size="10.5" fill="#5A6478">AY23/24</text>
+
+      <line x1="20" y1="200" x2="420" y2="200" stroke="#CBD1DE" stroke-width="1"/>
+      <rect x="20" y="0" width="9" height="9" fill="#0E6B63"/><text x="33" y="8" font-size="9.5" fill="#5A6478">Scope 2</text>
+      <rect x="105" y="0" width="9" height="9" fill="#F0731E"/><text x="118" y="8" font-size="9.5" fill="#5A6478">Scope 3</text>
+    </svg>`;
+  }
+  ['trend-chart-env','trend-chart-report'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = trendChartSVG();
+  });
+
+  renderAudit();
+
+  function estimateOffset(){
+    const name = document.getElementById('offset-name').value.trim();
+    const cat = document.getElementById('offset-cat').value;
+    const desc = document.getElementById('offset-desc').value.trim();
+    if (!name){ showToast('Enter a project name first.'); return; }
+
+    const loading = document.getElementById('offset-analyzing');
+    loading.style.display = 'block';
+    setTimeout(() => {
+      loading.style.display = 'none';
+      // Illustrative AI-style estimate: varies by category, not a real calculation
+      const rangeByCat = {
+        'Energy efficiency': [0.8, 2.5],
+        'Avoided travel/commuting': [1.0, 3.5],
+        'Waste reduction': [0.05, 0.4],
+        'Renewable energy': [1.5, 4.0],
+        'Sequestration / greening': [0.2, 0.9]
+      };
+      const [lo, hi] = rangeByCat[cat] || [0.2, 1.0];
+      const est = (lo + Math.random() * (hi - lo));
+
+      const card = document.createElement('div');
+      card.className = 'grade-card';
+      card.innerHTML = `
+        <div class="grade-head"><span>${name}</span><span class="grade-badge b">${est.toFixed(2)} tCO₂e/yr</span></div>
+        <div class="grade-body">${desc || cat + ' initiative'}<br><span style="color:var(--ink-faint);font-size:11px;">AI estimate — illustrative, based on ${cat.toLowerCase()} category assumptions. Needs a defined methodology before use in formal disclosure.</span></div>`;
+      document.getElementById('offset-list').prepend(card);
+
+      const totalEl = document.getElementById('offset-total');
+      const current = parseFloat(totalEl.textContent) || 0;
+      const newTotal = current + est;
+      totalEl.innerHTML = newTotal.toFixed(2) + '<span>tCO₂e / yr</span>';
+      const countEl = document.getElementById('offset-count');
+      const newCount = (parseInt(countEl.textContent) || 0) + 1;
+      countEl.textContent = newCount;
+
+      const reportOffset = document.getElementById('report-offset-total');
+      if (reportOffset) reportOffset.textContent = newTotal.toFixed(2) + ' tCO₂e/yr (' + newCount + ' projects, unverified estimate)';
+
+      document.getElementById('offset-name').value = '';
+      document.getElementById('offset-desc').value = '';
+      showToast('AI estimated ' + est.toFixed(2) + ' tCO₂e/yr avoided.');
+      logAudit('Offset project added — "' + name + '" — AI-estimated ' + est.toFixed(2) + ' tCO₂e/yr');
+    }, 1300);
+  }
+
+  function addCredential(){
+    const name = document.getElementById('cred-name').value.trim();
+    const issuer = document.getElementById('cred-issuer').value.trim();
+    const date = document.getElementById('cred-date').value;
+    if (!name){ showToast('Enter a credential name first.'); return; }
+
+    const item = document.createElement('div');
+    item.className = 'cert-item done';
+    item.innerHTML = `<span class="cn">${name}</span><span class="cd">${issuer || 'Issuer not specified'}${date ? ' · ' + date : ''}</span>`;
+    document.getElementById('cred-grid').appendChild(item);
+
+    const reportTable = document.getElementById('report-cred-table');
+    if (reportTable){
+      const row = document.createElement('tr');
+      row.innerHTML = `<td>${name}</td><td>${issuer || 'Issuer not specified'}${date ? ' · ' + date : ''}</td>`;
+      reportTable.appendChild(row);
+    }
+
+    document.getElementById('cred-name').value = '';
+    document.getElementById('cred-issuer').value = '';
+    document.getElementById('cred-date').value = '';
+    document.getElementById('cred-expiry').value = '';
+    showToast('Credential added.');
+    logAudit('Credential added — "' + name + '"' + (issuer ? ' from ' + issuer : ''));
+  }
+
+  function saveProfile(){
+    const val = id => document.getElementById(id).value;
+
+    // Company identity — topbar & sidebar
+    const name = val('p-name');
+    const industry = val('p-industry');
+    const employees = val('p-employees');
+    const offices = val('p-offices');
+    const period = val('p-period');
+
+    document.getElementById('topbar-meta').textContent = `${name} · ${industry} · ${employees} employees · ${offices} offices`;
+    document.getElementById('sidebar-foot-text').innerHTML = `${name}<br>${period} reporting period (demo)`;
+
+    // Environmental targets — Dashboard "Net-zero targets" card
+    document.getElementById('tgt-neutral-year').textContent = val('p-neutral-year');
+    document.getElementById('tgt-netzero-year').textContent = val('p-netzero-year');
+    document.getElementById('tgt-scope2').textContent = `-${val('p-scope2-pct')}% by ${val('p-scope2-year')}`;
+    document.getElementById('tgt-scope3').textContent = `-${val('p-scope3-pct')}% by ${val('p-scope3-year')}`;
+    document.getElementById('tgt-renewable').textContent = `${val('p-renew-pct')}% by ${val('p-renew-when')}`;
+    document.getElementById('tgt-paper').textContent = val('p-paper');
+
+    // Social targets — Social tab
+    document.getElementById('tgt-leadership').textContent = `Women in leadership roles +${val('p-leadership-pct')}% within ${val('p-leadership-years')} years`;
+    document.getElementById('tgt-upskill').textContent = `Upskill ${val('p-upskill-pct')}% of workforce over ${val('p-upskill-years')} years`;
+    document.getElementById('tgt-underrep').textContent = `+${val('p-underrep-pct')}% representation of underrepresented groups`;
+    document.getElementById('tgt-absentee').textContent = `-${val('p-absentee-pct')}% health-related absenteeism`;
+
+    showToast('Profile saved — targets updated across Dashboard and Social.');
+    logAudit(`Company profile saved — ${name}, ${employees} employees, targets updated`);
+  }
+
+  function showToast(msg){
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2600);
+  }
+</script>
+
+</body>
+</html>
